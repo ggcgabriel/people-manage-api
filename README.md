@@ -1,5 +1,7 @@
 # People Manage API
 
+Front - https://github.com/ggcgabriel/people-manage-ui
+
 API REST para gerenciamento de pessoas, com CRUD completo, validação de CPF, paginação e controle de status ativo/inativo.
 
 ## Tecnologias
@@ -66,16 +68,16 @@ A API estará disponível em `http://localhost:3000`.
 
 ## Scripts disponíveis
 
-| Script             | Comando                  | Descrição                     |
-|--------------------|--------------------------|-------------------------------|
-| `npm run dev`      | `nest start --watch`     | Dev com hot reload            |
-| `npm run build`    | `nest build`             | Compila para produção         |
-| `npm run start:prod` | `node dist/main`       | Roda o build de produção      |
-| `npm run test`     | `jest`                   | Testes unitários              |
-| `npm run test:cov` | `jest --coverage`        | Testes com cobertura          |
-| `npm run test:e2e` | `jest --config ./test/jest-e2e.json` | Testes end-to-end |
-| `npm run lint`     | `eslint --fix`           | Lint com auto-fix             |
-| `npm run format`   | `prettier --write`       | Formata o código              |
+| Script               | Comando                              | Descrição                |
+| -------------------- | ------------------------------------ | ------------------------ |
+| `npm run dev`        | `nest start --watch`                 | Dev com hot reload       |
+| `npm run build`      | `nest build`                         | Compila para produção    |
+| `npm run start:prod` | `node dist/main`                     | Roda o build de produção |
+| `npm run test`       | `jest`                               | Testes unitários         |
+| `npm run test:cov`   | `jest --coverage`                    | Testes com cobertura     |
+| `npm run test:e2e`   | `jest --config ./test/jest-e2e.json` | Testes end-to-end        |
+| `npm run lint`       | `eslint --fix`                       | Lint com auto-fix        |
+| `npm run format`     | `prettier --write`                   | Formata o código         |
 
 ## Documentação da API
 
@@ -87,8 +89,8 @@ http://localhost:3000/api/docs
 
 ## Variáveis de ambiente
 
-| Variável       | Descrição                          | Default                       |
-|----------------|------------------------------------|-------------------------------|
-| `DATABASE_URL` | Connection string do PostgreSQL    | —                             |
-| `PORT`         | Porta do servidor                  | `3000`                        |
-| `CORS_ORIGIN`  | Origem permitida para CORS         | `http://localhost:5173`       |
+| Variável       | Descrição                       | Default                 |
+| -------------- | ------------------------------- | ----------------------- |
+| `DATABASE_URL` | Connection string do PostgreSQL | —                       |
+| `PORT`         | Porta do servidor               | `3000`                  |
+| `CORS_ORIGIN`  | Origem permitida para CORS      | `http://localhost:5173` |
