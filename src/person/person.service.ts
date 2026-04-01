@@ -10,15 +10,25 @@ import { FilterPersonDto } from './dto/filter-person.dto.js';
 import { sanitizeCpf } from '../common/utils/cpf.util.js';
 import { Person, Prisma } from '../../generated/prisma/client.js';
 
+export interface PaginatedResult<T> {
+  data: T[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 @Injectable()
 export class PersonService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreatePersonDto): Promise<{ message: string }> {
+  async create(dto: CreatePersonDto): Promise<Person> {
     const cpf = sanitizeCpf(dto.cpf);
     await this.checkUniqueness(cpf, dto.email);
 
-    await this.prisma.person.create({
+    return this.prisma.person.create({
       data: {
         fullName: dto.fullName,
         email: dto.email,
@@ -27,13 +37,9 @@ export class PersonService {
         phone: dto.phone,
       },
     });
-
-    return {
-      message: 'Pessoa criada com sucesso!',
-    };
   }
 
-  async findAll(filters: FilterPersonDto): Promise<Person[]> {
+  async findAll(filters: FilterPersonDto): Promise<PaginatedResult<Person>> {
     const where: Prisma.PersonWhereInput = {};
 
     if (filters.isActive !== undefined) {
@@ -52,10 +58,29 @@ export class PersonService {
       where.cpf = { contains: sanitizeCpf(filters.cpf) };
     }
 
-    return this.prisma.person.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-    });
+    const page = filters.page ?? 1;
+    const limit = filters.limit ?? 10;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.person.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.person.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<Person> {
@@ -68,13 +93,13 @@ export class PersonService {
     return person;
   }
 
-  async update(id: string, dto: UpdatePersonDto): Promise<{ message: string }> {
+  async update(id: string, dto: UpdatePersonDto): Promise<Person> {
     await this.findOne(id);
 
     const cpf = dto.cpf ? sanitizeCpf(dto.cpf) : undefined;
     await this.checkUniqueness(cpf, dto.email, id);
 
-    const person = await this.prisma.person.update({
+    return this.prisma.person.update({
       where: { id },
       data: {
         ...dto,
@@ -82,17 +107,23 @@ export class PersonService {
         birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
       },
     });
+  }
 
-    return {
-      message: `${person.fullName} foi atualizado(a) com sucesso!`,
-    };
+  async toggleStatus(id: string): Promise<Person> {
+    const person = await this.findOne(id);
+
+    return this.prisma.person.update({
+      where: { id },
+      data: { isActive: !person.isActive },
+    });
   }
 
   async remove(id: string): Promise<{ message: string }> {
     await this.findOne(id);
     await this.prisma.person.delete({ where: { id } });
+
     return {
-      message: 'Pessoa deletada com sucesso!',
+      message: 'Pessoa removida com sucesso!',
     };
   }
 
